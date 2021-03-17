@@ -54,8 +54,8 @@ public class TourismAgencyController {
     }
 
     @PostMapping("/booking")
-    public BookingResponseDTO bookRoom(@Valid @RequestBody BookingRequestDTO bookingRequestDTO) throws InvalidDateException, InvalidDestinationException, InvalidPeopleForRoomException, UnavailableHotelException, InvalidCardDuesException {
-        return this.tourismAgencyService.bookRoom(bookingRequestDTO);
+    public BookingResponseDTO bookHotel(@Valid @RequestBody BookingRequestDTO bookingRequestDTO) throws InvalidDateException, InvalidDestinationException, InvalidPeopleForRoomException, UnavailableHotelException, InvalidCardDuesException {
+        return this.tourismAgencyService.bookHotel(bookingRequestDTO);
     }
 
     @GetMapping("/flights")
@@ -76,6 +76,13 @@ public class TourismAgencyController {
 
         return this.tourismAgencyService.getFlights(dateFromFilter, dateToFilter, origin, destination);
     }
+
+    @PostMapping("/flight-reservation")
+    public FlightReservationResponseDTO bookFlight(@Valid @RequestBody FlightReservationRequestDTO flightReservationRequestDTO) throws InvalidDateException, InvalidDestinationException, InvalidPeopleForFlightException, InvalidOriginException, InvalidCardDuesException, UnavailableFligthException {
+        return this.tourismAgencyService.bookFlight(flightReservationRequestDTO);
+    }
+
+
     /* #######################################################################################################
 
                                             HANDLERS

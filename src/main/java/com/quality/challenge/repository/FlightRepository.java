@@ -21,6 +21,7 @@ import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -81,5 +82,19 @@ public class FlightRepository implements IFlightRepository {
     @Override
     public void containsOrigin(String origin) throws InvalidOriginException {
         CitySearchUtil.flightContainsOrigin(this.flights, origin);
+    }
+
+    @Override
+    public Optional<FlightDTO> hasAvailability(String flightNumber, String origin, String destination, Date dateFrom, Date dateTo, String seatType) {
+        return this.flights
+            .stream()
+            .filter(flightDTO ->
+                flightDTO.getFlightNumber().equalsIgnoreCase(flightNumber) &&
+                flightDTO.getDestination().equalsIgnoreCase(destination) &&
+                flightDTO.getOrigin().equalsIgnoreCase(origin) &&
+                flightDTO.getDateFrom().equals(dateFrom) &&
+                flightDTO.getDateTo().equals(dateTo) &&
+                flightDTO.getSeatType().equalsIgnoreCase(seatType))
+            .findFirst();
     }
 }

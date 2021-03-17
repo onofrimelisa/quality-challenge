@@ -1,5 +1,6 @@
 package com.quality.challenge.dto;
 
+
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -11,7 +12,7 @@ import javax.validation.constraints.NotNull;
 @Getter
 @Setter
 @NoArgsConstructor
-public class BookingResponseDTO extends ResponseDTO{
+public class FlightReservationResponseDTO extends ResponseDTO {
     @Email
     @NotNull
     private String username;
@@ -23,5 +24,5 @@ public class BookingResponseDTO extends ResponseDTO{
     private Double total;
     @Valid
     @NotNull
-    private BookingDTO booking;
+    private FlightReservationDTO flightReservation;
 }

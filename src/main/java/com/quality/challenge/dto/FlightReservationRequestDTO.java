@@ -8,20 +8,15 @@ import javax.validation.Valid;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotNull;
 
+
 @Getter
 @Setter
 @NoArgsConstructor
-public class BookingResponseDTO extends ResponseDTO{
+public class FlightReservationRequestDTO {
     @Email
     @NotNull
     private String username;
     @NotNull
-    private Double amount;
-    @NotNull
-    private Double interest;
-    @NotNull
-    private Double total;
     @Valid
-    @NotNull
-    private BookingDTO booking;
+    private FlightReservationDTO flightReservation;
 }

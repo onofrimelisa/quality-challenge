@@ -1,6 +1,7 @@
 package com.quality.challenge.utils;
 
 import com.quality.challenge.dto.StatusCodeDTO;
+import com.quality.challenge.exceptions.InvalidPeopleForFlightException;
 import com.quality.challenge.exceptions.InvalidPeopleForRoomException;
 import org.springframework.http.HttpStatus;
 
@@ -9,7 +10,7 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
-public class RoomUtil {
+public class PeopleManagementUtil {
     private static final Map<String, Integer> peoplePerRoom = initialize();
 
     private static Map<String, Integer> initialize() {
@@ -27,6 +28,13 @@ public class RoomUtil {
         if (!numberOfPeople.equals(peopleAmount) || correctNumber == null || peopleAmount > correctNumber){
             StatusCodeDTO statusCodeDTO = StatusCodeUtil.getCustomStatusCode("The amount of people is incorrect for the chosen room, or the people sent is different from the amount of people value sent", HttpStatus.BAD_REQUEST);
             throw new InvalidPeopleForRoomException(statusCodeDTO);
+        }
+    }
+
+    public static void correctNumberOfPeopleForFlight(Integer seats, Integer numberOfPeople) throws InvalidPeopleForFlightException {
+        if (!numberOfPeople.equals(seats) || seats > 150){
+            StatusCodeDTO statusCodeDTO = StatusCodeUtil.getCustomStatusCode("The amount of people exceeds the flight capacity, or the people sent is different from the amount of people value sent", HttpStatus.BAD_REQUEST);
+            throw new InvalidPeopleForFlightException(statusCodeDTO);
         }
     }
 }

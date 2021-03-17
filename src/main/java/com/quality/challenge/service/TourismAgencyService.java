@@ -7,7 +7,7 @@ import com.quality.challenge.interfaces.IHotelRepository;
 import com.quality.challenge.interfaces.ITourismAgencyService;
 import com.quality.challenge.utils.CardUtil;
 import com.quality.challenge.utils.DateUtil;
-import com.quality.challenge.utils.RoomUtil;
+import com.quality.challenge.utils.PeopleManagementUtil;
 import com.quality.challenge.utils.StatusCodeUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -51,10 +51,10 @@ public class TourismAgencyService implements ITourismAgencyService {
     }
 
     @Override
-    public BookingResponseDTO bookRoom(BookingRequestDTO bookingRequestDTO) throws InvalidPeopleForRoomException, InvalidDestinationException, InvalidDateException, UnavailableHotelException, InvalidCardDuesException {
+    public BookingResponseDTO bookHotel(BookingRequestDTO bookingRequestDTO) throws InvalidPeopleForRoomException, InvalidDestinationException, InvalidDateException, UnavailableHotelException, InvalidCardDuesException {
         BookingDTO booking = bookingRequestDTO.getBooking();
         validateFilters(booking.getDateFrom(), booking.getDateTo(), booking.getDestination());
-        RoomUtil.correctNumberOfPeopleForRoom(booking.getRoomType(), booking.getPeopleAmount(), booking.getPeople().size());
+        PeopleManagementUtil.correctNumberOfPeopleForRoom(booking.getRoomType(), booking.getPeopleAmount(), booking.getPeople().size());
 
         Optional<HotelDTO> hotelWithAvailability = this.hotelRepository.hasAvailability(
             booking.getHotelCode(),
@@ -104,6 +104,38 @@ public class TourismAgencyService implements ITourismAgencyService {
         return response;
     }
 
+    @Override
+    public FlightReservationResponseDTO bookFlight(FlightReservationRequestDTO reservationRequestDTO) throws InvalidDateException, InvalidOriginException, InvalidDestinationException, InvalidPeopleForFlightException, InvalidCardDuesException, UnavailableFligthException {
+        FlightReservationDTO flightReservation = reservationRequestDTO.getFlightReservation();
+        validateFilters(flightReservation.getDateFrom(), flightReservation.getDateTo(), flightReservation.getDestination(), flightReservation.getOrigin());
+        PeopleManagementUtil.correctNumberOfPeopleForFlight(flightReservation.getSeats(), flightReservation.getPeople().size());
+
+        Optional<FlightDTO> flightWithAvailability = this.flightRepository.hasAvailability(
+            flightReservation.getFlightNumber(),
+            flightReservation.getOrigin(),
+            flightReservation.getDestination(),
+            flightReservation.getDateFrom(),
+            flightReservation.getDateTo(),
+            flightReservation.getSeatType()
+        );
+
+        if(flightWithAvailability.isPresent()){
+            FlightReservationResponseDTO flightReservationResponseDTO = new FlightReservationResponseDTO();
+            flightReservationResponseDTO.setFlightReservation(flightReservation);
+            Double amount = calculateAmount(flightWithAvailability.get(), flightReservation.getSeats());
+            flightReservationResponseDTO.setAmount(amount);
+            Double interest = calculateInterest(flightReservation.getPaymentMethod());
+            flightReservationResponseDTO.setInterest(interest);
+            flightReservationResponseDTO.setTotal(calculateTotal(amount, interest));
+            flightReservationResponseDTO.setStatusCodeDTO(StatusCodeUtil.getSuccessfulOperationStatusCode());
+            flightReservationResponseDTO.setUsername(reservationRequestDTO.getUsername());
+            return flightReservationResponseDTO;
+        }
+
+        StatusCodeDTO statusCodeDTO = StatusCodeUtil.getCustomStatusCode("The chosen flight has no availability for the dates, destination, origin and seat type selected", HttpStatus.BAD_REQUEST);
+        throw new UnavailableFligthException(statusCodeDTO);
+    }
+
     private void validateFilters(Date dateFrom, Date dateTo, String destination) throws InvalidDateException, InvalidDestinationException {
         DateUtil.correctDateFromAndDateTo(dateFrom, dateTo);
         this.hotelRepository.containsDestination(destination);
@@ -118,6 +150,10 @@ public class TourismAgencyService implements ITourismAgencyService {
     private Double calculateAmount(HotelDTO hotel, Date dateFrom, Date dateTo){
         Long daysBetweenDates = DateUtil.calculateDaysBetweenDates(dateFrom, dateTo);
         return hotel.getPrice() * daysBetweenDates;
+    }
+
+    private Double calculateAmount(FlightDTO flight, Integer seats){
+        return flight.getPrice() * seats;
     }
 
     private Double calculateInterest(PaymentMethodDTO paymentMethod) throws InvalidCardDuesException {
