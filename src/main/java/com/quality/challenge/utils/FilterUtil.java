@@ -5,7 +5,7 @@ import com.quality.challenge.dto.HotelDTO;
 import java.util.Date;
 import java.util.function.Predicate;
 
-public class Filter {
+public class FilterUtil {
 
     // HOTEL FILTERS
 

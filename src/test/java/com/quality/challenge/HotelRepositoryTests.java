@@ -32,7 +32,7 @@ class HotelRepositoryTests {
     }
 
     @Test
-    void getHotelsWithFilters() throws ParseException {
+    void getHotelsWithFilters() {
         // Arrange
         List<HotelDTO> allHotels = this.hotelRepository.getHotels();
         Date dateFrom = new Date("11/02/2021");

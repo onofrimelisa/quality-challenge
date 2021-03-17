@@ -3,7 +3,7 @@ package com.quality.challenge.utils;
 import com.quality.challenge.dto.StatusCodeDTO;
 import org.springframework.http.HttpStatus;
 
-public class StatusCode {
+public class StatusCodeUtil {
     public static StatusCodeDTO getSuccessfulOperationStatusCode() {
         return new StatusCodeDTO("Operation performed successfully", HttpStatus.OK);
     }

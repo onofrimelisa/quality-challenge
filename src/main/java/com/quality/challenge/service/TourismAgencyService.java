@@ -7,7 +7,8 @@ import com.quality.challenge.exceptions.InvalidDateException;
 import com.quality.challenge.exceptions.InvalidDestinationException;
 import com.quality.challenge.interfaces.IHotelRepository;
 import com.quality.challenge.interfaces.ITourismAgencyService;
-import com.quality.challenge.utils.StatusCode;
+import com.quality.challenge.utils.DateUtil;
+import com.quality.challenge.utils.StatusCodeUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -30,7 +31,7 @@ public class TourismAgencyService implements ITourismAgencyService {
         List<HotelDTO> hotels = this.hotelRepository.getHotels();
         response.setList(hotels);
         response.setTotal(hotels.size());
-        response.setStatusCodeDTO(StatusCode.getSuccessfulOperationStatusCode());
+        response.setStatusCodeDTO(StatusCodeUtil.getSuccessfulOperationStatusCode());
         return response;
     }
 
@@ -42,19 +43,12 @@ public class TourismAgencyService implements ITourismAgencyService {
         List<HotelDTO> hotels = this.hotelRepository.getHotels(dateFrom, dateTo, destination);
         response.setList(hotels);
         response.setTotal(hotels.size());
-        response.setStatusCodeDTO(StatusCode.getSuccessfulOperationStatusCode());
+        response.setStatusCodeDTO(StatusCodeUtil.getSuccessfulOperationStatusCode());
         return response;
     }
 
     private void validateFilters(Date dateFrom, Date dateTo, String destination) throws InvalidDateException, InvalidDestinationException {
-        if (dateFrom.after(dateTo)){
-            StatusCodeDTO statusCodeDTO = StatusCode.getCustomStatusCode("The dateFrom field must be smaller than the dateTo field", HttpStatus.BAD_REQUEST);
-            throw new InvalidDateException(statusCodeDTO);
-        }
-
-        if (Boolean.FALSE.equals(this.hotelRepository.containsDestination(destination))) {
-            StatusCodeDTO statusCodeDTO = StatusCode.getCustomStatusCode("The chosen destination does not exist", HttpStatus.NOT_FOUND);
-            throw new InvalidDestinationException(statusCodeDTO);
-        }
+        DateUtil.correctDateFromAndDateTo(dateFrom, dateTo);
+        this.hotelRepository.containsDestination(destination);
     }
 }

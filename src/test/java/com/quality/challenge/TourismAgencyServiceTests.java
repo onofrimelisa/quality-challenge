@@ -7,7 +7,7 @@ import com.quality.challenge.exceptions.InvalidDestinationException;
 import com.quality.challenge.interfaces.IHotelRepository;
 import com.quality.challenge.interfaces.ITourismAgencyService;
 import com.quality.challenge.service.TourismAgencyService;
-import com.quality.challenge.utils.StatusCode;
+import com.quality.challenge.utils.StatusCodeUtil;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -49,10 +49,10 @@ public class TourismAgencyServiceTests {
     }
 
     @Test
-    void getHotelsWithFiltersSuccess(){
+    void getHotelsWithFiltersSuccess() throws InvalidDestinationException {
         // Arrange
         List<HotelDTO> hotels = getHotelsDTO();
-        Mockito.when(this.hotelRepository.containsDestination(Mockito.anyString())).thenReturn(true);
+        Mockito.doNothing().when(this.hotelRepository).containsDestination(Mockito.anyString());
         Mockito.when(this.hotelRepository.getHotels(Mockito.any(), Mockito.any(), Mockito.anyString())).thenReturn(hotels);
 
         // Act & Assert
@@ -67,24 +67,24 @@ public class TourismAgencyServiceTests {
     }
 
     @Test
-    void getHotelsWithFiltersThrowsInvalidDestinationException() {
+    void getHotelsWithFiltersThrowsInvalidDestinationException() throws InvalidDestinationException {
         // Arrange
-        Mockito.when(this.hotelRepository.containsDestination(Mockito.anyString())).thenReturn(false);
-        InvalidDestinationException expectedException = new InvalidDestinationException(StatusCode.getCustomStatusCode("The chosen destination does not exist", HttpStatus.NOT_FOUND));
+        InvalidDestinationException expectedException = new InvalidDestinationException(StatusCodeUtil.getCustomStatusCode("The chosen destination does not exist", HttpStatus.NOT_FOUND));
+        Mockito.doThrow(expectedException).when(this.hotelRepository).containsDestination(Mockito.anyString());
 
         // Act & Assert
         InvalidDestinationException thrownException = Assertions.assertThrows(
                 InvalidDestinationException.class,
                 () -> this.tourismAgencyService.getHotels(new Date("03/02/2021"), new Date("03/04/2021"), Mockito.anyString())
         );
-        Assertions.assertEquals(expectedException.getMessage(), thrownException.getMessage());
+        Assertions.assertEquals(expectedException, thrownException);
         Assertions.assertEquals(HttpStatus.NOT_FOUND, thrownException.getStatusCodeDTO().getStatus());
     }
 
     @Test
     void getHotelsWithFiltersThrowsInvalidDateException() {
         // Arrange
-        InvalidDateException expectedException = new InvalidDateException(StatusCode.getCustomStatusCode("The dateFrom field must be smaller than the dateTo field", HttpStatus.BAD_REQUEST));
+        InvalidDateException expectedException = new InvalidDateException(StatusCodeUtil.getCustomStatusCode("The dateFrom field must be smaller than the dateTo field", HttpStatus.BAD_REQUEST));
 
         // Act & Assert
         InvalidDateException thrownException = Assertions.assertThrows(
