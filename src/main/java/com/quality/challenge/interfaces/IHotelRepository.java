@@ -12,4 +12,6 @@ public interface IHotelRepository {
     List<HotelDTO> getHotels();
     List<HotelDTO> getHotels(Date dateFrom, Date dateTo, String destination);
     void containsDestination(String destiny) throws InvalidDestinationException;
+    Boolean hasAvailability(String hotelCode, String destination, Date dateFrom, Date dateTo, String roomType);
+    void bookHotel(String hotelCode);
 }

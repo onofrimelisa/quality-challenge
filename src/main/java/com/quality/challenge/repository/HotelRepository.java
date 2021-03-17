@@ -19,6 +19,7 @@ import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -75,5 +76,29 @@ public class HotelRepository implements IHotelRepository {
     @Override
     public void containsDestination(String destination) throws InvalidDestinationException {
         DestinationUtil.containsDestination(this.hotels, destination);
+    }
+
+    @Override
+    public Boolean hasAvailability(String hotelCode, String destination, Date dateFrom, Date dateTo, String roomType) {
+        Optional<HotelDTO> availableHotel = this.hotels
+            .stream()
+            .filter(hotelDTO ->
+                    hotelDTO.getCode().equalsIgnoreCase(hotelCode) &&
+                    hotelDTO.getCity().equalsIgnoreCase(destination) &&
+                    hotelDTO.getAvailableFrom().before(dateFrom) &&
+                    hotelDTO.getAvailableTo().after(dateTo) &&
+                    hotelDTO.getRoomType().equalsIgnoreCase(roomType) &&
+                    Boolean.FALSE.equals(hotelDTO.getBooked()))
+            .findFirst();
+        return availableHotel.isPresent();
+    }
+
+    @Override
+    public void bookHotel(String hotelCode) {
+        Optional<HotelDTO> hotelToBook = this.hotels
+            .stream()
+            .filter(hotelDTO -> hotelDTO.getCode().equalsIgnoreCase(hotelCode))
+            .findFirst();
+        hotelToBook.ifPresent(hotelDTO -> hotelDTO.setBooked(true));
     }
 }

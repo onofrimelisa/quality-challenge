@@ -1,9 +1,8 @@
 package com.quality.challenge.controller;
 
+import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import com.quality.challenge.dto.*;
-import com.quality.challenge.exceptions.InvalidDateException;
-import com.quality.challenge.exceptions.InvalidDestinationException;
-import com.quality.challenge.exceptions.TourismAgencyException;
+import com.quality.challenge.exceptions.*;
 import com.quality.challenge.interfaces.ITourismAgencyService;
 import com.quality.challenge.utils.StatusCodeUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +10,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
@@ -54,8 +54,8 @@ public class TourismAgencyController {
     }
 
     @PostMapping("/booking")
-    public BookingResponseDTO bookRoom(@Valid @RequestBody BookingRequestDTO bookingRequestDTO){
-        return null;
+    public BookingResponseDTO bookRoom(@Valid @RequestBody BookingRequestDTO bookingRequestDTO) throws InvalidDateException, InvalidDestinationException, InvalidPeopleForRoomException, UnavailableHotelException {
+        return this.tourismAgencyService.bookRoom(bookingRequestDTO);
     }
 
     /* #######################################################################################################
@@ -69,15 +69,15 @@ public class TourismAgencyController {
         return new ResponseEntity<>(searchEngineException.getStatusCodeDTO(), searchEngineException.getStatusCodeDTO().getStatus());
     }
 
-    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
-    public ResponseEntity<StatusCodeDTO> handleTypeMismatchException() {
+    @ExceptionHandler({MethodArgumentTypeMismatchException.class, InvalidFormatException.class})
+    public ResponseEntity<StatusCodeDTO> handleTypeMismatchException(Exception e) {
         StatusCodeDTO statusCodeDTO = StatusCodeUtil.getCustomStatusCode("The date must have the format dd/mm/yyyy", HttpStatus.BAD_REQUEST);
         return new ResponseEntity<>(statusCodeDTO, statusCodeDTO.getStatus());
     }
 
-    @ExceptionHandler(ConstraintViolationException.class)
-    public ResponseEntity<StatusCodeDTO> handleConstraintViolationException(ConstraintViolationException constraintViolationException) {
-        StatusCodeDTO statusCodeDTO = StatusCodeUtil.getCustomStatusCode("The parameters sent are not compatible", HttpStatus.BAD_REQUEST);
+    @ExceptionHandler({ConstraintViolationException.class, MethodArgumentNotValidException.class})
+    public ResponseEntity<StatusCodeDTO> handleConstraintViolationException(Exception constraintViolationException) {
+        StatusCodeDTO statusCodeDTO = StatusCodeUtil.getCustomStatusCode("The parameters sent are not valid", HttpStatus.BAD_REQUEST);
         return new ResponseEntity<>(statusCodeDTO, statusCodeDTO.getStatus());
     }
 }

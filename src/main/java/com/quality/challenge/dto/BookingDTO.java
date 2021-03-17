@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
@@ -28,6 +29,7 @@ public class BookingDTO {
     @NotEmpty
     private String hotelCode;
     @Min(1)
+    @NotNull
     private Integer peopleAmount;
     @NotEmpty
     private String roomType;
@@ -36,5 +38,5 @@ public class BookingDTO {
     private List<PeopleDTO> people;
     @NotNull
     @Valid
-    private PaymentMethodDTO paymentMethodDTO;
+    private PaymentMethodDTO paymentMethod;
 }
