@@ -12,7 +12,7 @@ public interface IHotelRepository {
     List<HotelDTO> loadDatabase() throws ServerErrorException;
     List<HotelDTO> getHotels();
     List<HotelDTO> getHotels(Date dateFrom, Date dateTo, String destination);
-    void containsDestination(String destiny) throws InvalidDestinationException;
+    void containsDestination(String destination) throws InvalidDestinationException;
     Optional<HotelDTO> hasAvailability(String hotelCode, String destination, Date dateFrom, Date dateTo, String roomType);
     void bookHotel(String hotelCode);
 }

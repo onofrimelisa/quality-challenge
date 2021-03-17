@@ -2,6 +2,7 @@ package com.quality.challenge.service;
 
 import com.quality.challenge.dto.*;
 import com.quality.challenge.exceptions.*;
+import com.quality.challenge.interfaces.IFlightRepository;
 import com.quality.challenge.interfaces.IHotelRepository;
 import com.quality.challenge.interfaces.ITourismAgencyService;
 import com.quality.challenge.utils.CardUtil;
@@ -19,10 +20,12 @@ import java.util.Optional;
 @Service
 public class TourismAgencyService implements ITourismAgencyService {
     private final IHotelRepository hotelRepository;
+    private final IFlightRepository flightRepository;
 
     @Autowired
-    public TourismAgencyService(IHotelRepository hotelRepository) {
+    public TourismAgencyService(IHotelRepository hotelRepository, IFlightRepository flightRepository) {
         this.hotelRepository = hotelRepository;
+        this.flightRepository = flightRepository;
     }
 
     @Override
@@ -79,9 +82,37 @@ public class TourismAgencyService implements ITourismAgencyService {
         throw new UnavailableHotelException(statusCodeDTO);
     }
 
+    @Override
+    public ListResponseDTO<FlightDTO> getFlights() {
+        ListResponseDTO<FlightDTO> response = new ListResponseDTO<>();
+        List<FlightDTO> flights = this.flightRepository.getFlights();
+        response.setList(flights);
+        response.setTotal(flights.size());
+        response.setStatusCodeDTO(StatusCodeUtil.getSuccessfulOperationStatusCode());
+        return response;
+    }
+
+    @Override
+    public ListResponseDTO<FlightDTO> getFlights(Date dateFrom, Date dateTo, String origin, String destination) throws InvalidDateException, InvalidOriginException, InvalidDestinationException {
+        validateFilters(dateFrom, dateTo, destination, origin);
+
+        ListResponseDTO<FlightDTO> response = new ListResponseDTO<>();
+        List<FlightDTO> flights = this.flightRepository.getFlights(dateFrom, dateTo, origin, destination);
+        response.setList(flights);
+        response.setTotal(flights.size());
+        response.setStatusCodeDTO(StatusCodeUtil.getSuccessfulOperationStatusCode());
+        return response;
+    }
+
     private void validateFilters(Date dateFrom, Date dateTo, String destination) throws InvalidDateException, InvalidDestinationException {
         DateUtil.correctDateFromAndDateTo(dateFrom, dateTo);
         this.hotelRepository.containsDestination(destination);
+    }
+
+    private void validateFilters(Date dateFrom, Date dateTo, String destination, String origin) throws InvalidDateException, InvalidDestinationException, InvalidOriginException {
+        DateUtil.correctDateFromAndDateTo(dateFrom, dateTo);
+        this.flightRepository.containsDestination(destination);
+        this.flightRepository.containsOrigin(origin);
     }
 
     private Double calculateAmount(HotelDTO hotel, Date dateFrom, Date dateTo){

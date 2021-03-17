@@ -7,7 +7,7 @@ import com.quality.challenge.dto.StatusCodeDTO;
 import com.quality.challenge.exceptions.InvalidDestinationException;
 import com.quality.challenge.exceptions.ServerErrorException;
 import com.quality.challenge.interfaces.IHotelRepository;
-import com.quality.challenge.utils.DestinationUtil;
+import com.quality.challenge.utils.CitySearchUtil;
 import com.quality.challenge.utils.FilterUtil;
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
@@ -59,7 +59,6 @@ public class HotelRepository implements IHotelRepository {
 
     @Override
     public List<HotelDTO> getHotels(Date dateFrom, Date dateTo, String destination) {
-        List<HotelDTO> hotelsList = this.hotels;
         List<Predicate<HotelDTO>> allPredicates = new ArrayList<>();
 
         allPredicates.add(FilterUtil.filterHotelsByDateTo(dateTo));
@@ -67,7 +66,7 @@ public class HotelRepository implements IHotelRepository {
         allPredicates.add(FilterUtil.filterHotelsByDestination(destination));
         allPredicates.add(FilterUtil.filterHotelsByBooking(false));
 
-        return hotelsList
+        return this.hotels
             .stream()
             .filter(allPredicates.stream().reduce(x->true, Predicate::and))
             .collect(Collectors.toList());
@@ -75,22 +74,21 @@ public class HotelRepository implements IHotelRepository {
 
     @Override
     public void containsDestination(String destination) throws InvalidDestinationException {
-        DestinationUtil.containsDestination(this.hotels, destination);
+        CitySearchUtil.hotelContainsDestination(this.hotels, destination);
     }
 
     @Override
     public Optional<HotelDTO> hasAvailability(String hotelCode, String destination, Date dateFrom, Date dateTo, String roomType) {
-        Optional<HotelDTO> availableHotel = this.hotels
+        return this.hotels
             .stream()
             .filter(hotelDTO ->
-                    hotelDTO.getCode().equalsIgnoreCase(hotelCode) &&
-                    hotelDTO.getCity().equalsIgnoreCase(destination) &&
-                    hotelDTO.getAvailableFrom().before(dateFrom) &&
-                    hotelDTO.getAvailableTo().after(dateTo) &&
-                    hotelDTO.getRoomType().equalsIgnoreCase(roomType) &&
-                    Boolean.FALSE.equals(hotelDTO.getBooked()))
+                hotelDTO.getCode().equalsIgnoreCase(hotelCode) &&
+                hotelDTO.getCity().equalsIgnoreCase(destination) &&
+                hotelDTO.getAvailableFrom().before(dateFrom) &&
+                hotelDTO.getAvailableTo().after(dateTo) &&
+                hotelDTO.getRoomType().equalsIgnoreCase(roomType) &&
+                Boolean.FALSE.equals(hotelDTO.getBooked()))
             .findFirst();
-        return availableHotel;
     }
 
     @Override

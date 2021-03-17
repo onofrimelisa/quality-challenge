@@ -1,5 +1,6 @@
 package com.quality.challenge.utils;
 
+import com.quality.challenge.dto.FlightDTO;
 import com.quality.challenge.dto.HotelDTO;
 
 import java.util.Date;
@@ -23,5 +24,23 @@ public class FilterUtil {
 
     public static Predicate<HotelDTO> filterHotelsByBooking(Boolean booked){
         return hotelDTO -> hotelDTO.getBooked().equals(booked);
+    }
+
+    // FLIGHTS FILTERS
+
+    public static Predicate<FlightDTO> filterFlightsByDateTo(Date dateTo){
+        return flightDTO -> flightDTO.getDateTo().equals(dateTo) || flightDTO.getDateTo().before(dateTo);
+    }
+
+    public static Predicate<FlightDTO> filterFlightsByDateFrom(Date dateFrom){
+        return flightDTO -> flightDTO.getDateFrom().equals(dateFrom) || flightDTO.getDateFrom().after(dateFrom);
+    }
+
+    public static Predicate<FlightDTO> filterFlightsByDestination(String destination){
+        return flightDTO -> flightDTO.getDestination().equalsIgnoreCase(destination);
+    }
+
+    public static Predicate<FlightDTO> filterFlightsByOrigin(String origin){
+        return flightDTO -> flightDTO.getOrigin().equalsIgnoreCase(origin);
     }
 }

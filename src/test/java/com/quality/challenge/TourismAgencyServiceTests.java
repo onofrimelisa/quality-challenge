@@ -4,6 +4,7 @@ import com.quality.challenge.dto.HotelDTO;
 import com.quality.challenge.dto.ListResponseDTO;
 import com.quality.challenge.exceptions.InvalidDateException;
 import com.quality.challenge.exceptions.InvalidDestinationException;
+import com.quality.challenge.interfaces.IFlightRepository;
 import com.quality.challenge.interfaces.IHotelRepository;
 import com.quality.challenge.interfaces.ITourismAgencyService;
 import com.quality.challenge.service.TourismAgencyService;
@@ -25,11 +26,13 @@ public class TourismAgencyServiceTests {
     private ITourismAgencyService tourismAgencyService;
     @Mock
     private IHotelRepository hotelRepository;
+    @Mock
+    private IFlightRepository flightRepository;
 
     @BeforeEach
     public void setContext(){
         initMocks(this);
-        tourismAgencyService = new TourismAgencyService(hotelRepository);
+        tourismAgencyService = new TourismAgencyService(hotelRepository, flightRepository);
     }
 
     @Test

@@ -58,6 +58,24 @@ public class TourismAgencyController {
         return this.tourismAgencyService.bookRoom(bookingRequestDTO);
     }
 
+    @GetMapping("/flights")
+    public ListResponseDTO<FlightDTO> getFlights(){
+        return this.tourismAgencyService.getFlights();
+    }
+
+    @GetMapping(value = "/flights", params = {"dateFrom", "dateTo", "destination", "origin"})
+    public ListResponseDTO<FlightDTO> getFlights(
+            @Valid @RequestParam @DateTimeFormat(pattern = DATE_FORMAT) @NotNull LocalDate dateTo,
+            @Valid @RequestParam @DateTimeFormat(pattern = DATE_FORMAT) @NotNull LocalDate dateFrom,
+            @Valid @RequestParam @NotEmpty String destination,
+            @Valid @RequestParam @NotEmpty String origin
+    ) throws InvalidDateException, InvalidDestinationException, InvalidOriginException {
+        ZoneId defaultZoneId = ZoneId.systemDefault();
+        Date dateToFilter = Date.from(dateTo.atStartOfDay(defaultZoneId).toInstant());
+        Date dateFromFilter = Date.from(dateFrom.atStartOfDay(defaultZoneId).toInstant());
+
+        return this.tourismAgencyService.getFlights(dateFromFilter, dateToFilter, origin, destination);
+    }
     /* #######################################################################################################
 
                                             HANDLERS
