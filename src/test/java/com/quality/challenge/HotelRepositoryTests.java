@@ -8,6 +8,9 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.util.Date;
 import java.util.List;
 
 class HotelRepositoryTests {
@@ -26,5 +29,22 @@ class HotelRepositoryTests {
         // Assertions
         Assertions.assertNotNull(result);
         Assertions.assertTrue(result.size() > 0);
+    }
+
+    @Test
+    void getHotelsWithFilters() throws ParseException {
+        // Arrange
+        List<HotelDTO> allHotels = this.hotelRepository.getHotels();
+        Date dateFrom = new Date("11/02/2021");
+        Date dateTo = new Date("02/03/2021");
+
+        // Act
+        List<HotelDTO> result = this.hotelRepository.getHotels(dateFrom, dateTo, "puerto iguazú");
+
+        // Assert
+        Assertions.assertNotNull(result);
+        Assertions.assertNotEquals(allHotels, result);
+        Assertions.assertNotEquals(allHotels.size(), result.size());
+        Assertions.assertTrue(allHotels.size() > result.size());
     }
 }

@@ -15,6 +15,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
+import javax.validation.constraints.Future;
+import javax.validation.constraints.NotNull;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -43,9 +45,9 @@ public class TourismAgencyController {
 
     @GetMapping(value = "/hotels", params = {"dateFrom", "dateTo", "destination"})
     public ListResponseDTO<HotelDTO> getHotels(
-        @RequestParam @DateTimeFormat(pattern = DATE_FORMAT) LocalDate dateTo,
-        @RequestParam @DateTimeFormat(pattern = DATE_FORMAT) LocalDate dateFrom,
-        @RequestParam String destination
+        @RequestParam @DateTimeFormat(pattern = DATE_FORMAT) @NotNull LocalDate dateTo,
+        @RequestParam @DateTimeFormat(pattern = DATE_FORMAT) @NotNull LocalDate dateFrom,
+        @RequestParam @NotNull String destination
     ) throws InvalidDateException, InvalidDestinationException {
         ZoneId defaultZoneId = ZoneId.systemDefault();
         Date dateToFilter = Date.from(dateTo.atStartOfDay(defaultZoneId).toInstant());
