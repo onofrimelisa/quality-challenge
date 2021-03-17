@@ -4,6 +4,7 @@ import com.quality.challenge.dto.StatusCodeDTO;
 import com.quality.challenge.exceptions.InvalidDateException;
 import org.springframework.http.HttpStatus;
 
+import java.time.temporal.ChronoUnit;
 import java.util.Date;
 
 public class DateUtil {
@@ -13,5 +14,9 @@ public class DateUtil {
             throw new InvalidDateException(statusCodeDTO);
         }
 
+    }
+
+    public static Long calculateDaysBetweenDates(Date dateFrom, Date dateTo){
+        return ChronoUnit.DAYS.between(dateFrom.toInstant(), dateTo.toInstant());
     }
 }

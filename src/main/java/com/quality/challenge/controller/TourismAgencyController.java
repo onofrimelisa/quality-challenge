@@ -54,7 +54,7 @@ public class TourismAgencyController {
     }
 
     @PostMapping("/booking")
-    public BookingResponseDTO bookRoom(@Valid @RequestBody BookingRequestDTO bookingRequestDTO) throws InvalidDateException, InvalidDestinationException, InvalidPeopleForRoomException, UnavailableHotelException {
+    public BookingResponseDTO bookRoom(@Valid @RequestBody BookingRequestDTO bookingRequestDTO) throws InvalidDateException, InvalidDestinationException, InvalidPeopleForRoomException, UnavailableHotelException, InvalidCardDuesException {
         return this.tourismAgencyService.bookRoom(bookingRequestDTO);
     }
 

@@ -79,7 +79,7 @@ public class HotelRepository implements IHotelRepository {
     }
 
     @Override
-    public Boolean hasAvailability(String hotelCode, String destination, Date dateFrom, Date dateTo, String roomType) {
+    public Optional<HotelDTO> hasAvailability(String hotelCode, String destination, Date dateFrom, Date dateTo, String roomType) {
         Optional<HotelDTO> availableHotel = this.hotels
             .stream()
             .filter(hotelDTO ->
@@ -90,7 +90,7 @@ public class HotelRepository implements IHotelRepository {
                     hotelDTO.getRoomType().equalsIgnoreCase(roomType) &&
                     Boolean.FALSE.equals(hotelDTO.getBooked()))
             .findFirst();
-        return availableHotel.isPresent();
+        return availableHotel;
     }
 
     @Override
