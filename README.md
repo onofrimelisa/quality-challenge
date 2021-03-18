@@ -52,17 +52,17 @@ URL: localhost:8080/api/v1/flight-reservation
         "people": [
             {
                 "dni": "4568215",
-                "name": "bu",
-                "lastname": "bu",
-                "birthDate": "10/12/2021",
+                "name": "Arjona",
+                "lastname": "Miguel",
+                "birthDate": "10/25/8759",
                 "mail": "arjonamiguel@gmail.com"
             },
             {
                 "dni": "4568215",
-                "name": "bu",
-                "lastname": "bu",
-                "birthDate": "10/12/2021",
-                "mail": "arjonamiguel@gmail.com"
+                "name": "Martin",
+                "lastname": "Suarez",
+                "birthDate": "10/25/8759",
+                "mail": "martin@gmail.com"
             }
         ],
         "paymentMethod": {
@@ -105,24 +105,24 @@ URL: localhost:8080/api/v1/booking
         "people": [
             {
                 "dni": "4568215",
-                "name": "bu",
-                "lastname": "bu",
+                "name": "Arjona",
+                "lastname": "Miguel",
                 "birthDate": "10/25/8759",
                 "mail": "arjonamiguel@gmail.com"
             },
             {
                 "dni": "4568215",
-                "name": "bu",
-                "lastname": "bu",
+                "name": "Martin",
+                "lastname": "Suarez",
                 "birthDate": "10/25/8759",
-                "mail": "arjonamiguel@gmail.com"
+                "mail": "martin@gmail.com"
             },
             {
                 "dni": "4568215",
-                "name": "bu",
-                "lastname": "bu",
+                "name": "Melisa",
+                "lastname": "Lemos",
                 "birthDate": "10/25/8759",
-                "mail": "arjonamiguel@gmail.com"
+                "mail": "mlemos@gmail.com"
             }
         ],
         "paymentMethod": {
@@ -215,4 +215,4 @@ URL: localhost:8080/api/v1/hotels
 
 ---
 [Back to top](#quality-challenge)
-> Made with &#9829; by [thedevsaddam](https://github.com/thedevsaddam) | Generated at: 2021-03-18 12:03:58 by [docgen](https://github.com/thedevsaddam/docgen)
+> Made with &#9829; by [thedevsaddam](https://github.com/thedevsaddam) | Generated at: 2021-03-18 12:09:43 by [docgen](https://github.com/thedevsaddam/docgen)
