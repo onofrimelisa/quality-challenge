@@ -12,6 +12,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 import org.springframework.http.HttpStatus;
 
 import java.util.ArrayList;
@@ -19,7 +20,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
-import static org.mockito.MockitoAnnotations.initMocks;
+import static org.mockito.MockitoAnnotations.openMocks;
 
 public class TourismAgencyServiceTests {
     private ITourismAgencyService tourismAgencyService;
@@ -30,7 +31,7 @@ public class TourismAgencyServiceTests {
 
     @BeforeEach
     public void setContext(){
-        initMocks(this);
+        openMocks(this);
         tourismAgencyService = new TourismAgencyService(hotelRepository, flightRepository);
     }
 
@@ -95,7 +96,7 @@ public class TourismAgencyServiceTests {
         // Act & Assert
         InvalidDateException thrownException = Assertions.assertThrows(
                 InvalidDateException.class,
-                () -> this.tourismAgencyService.getHotels(new Date("03/04/2021"), new Date("03/02/2021"), Mockito.anyString())
+                () -> this.tourismAgencyService.getHotels(new Date("03/04/2021"), new Date("03/02/2021"), "puerto iguazú")
         );
         Assertions.assertEquals(expectedException.getMessage(), thrownException.getMessage());
         Assertions.assertEquals(HttpStatus.BAD_REQUEST, thrownException.getStatusCodeDTO().getStatus());
@@ -225,6 +226,108 @@ public class TourismAgencyServiceTests {
         Assertions.assertEquals(HttpStatus.BAD_REQUEST, thrownException.getStatusCodeDTO().getStatus());
     }
 
+    @Test
+    void getFlights(){
+        // Arrange
+        List<FlightDTO> flights = getFlightsDTO();
+        Mockito.when(this.flightRepository.getFlights()).thenReturn(flights);
+
+        // Act
+        ListResponseDTO<FlightDTO> result = this.tourismAgencyService.getFlights();
+
+        // Assert
+        Assertions.assertNotNull(result);
+        Assertions.assertIterableEquals(flights, result.getList());
+        Assertions.assertEquals(flights.size(), result.getTotal());
+        Assertions.assertEquals(HttpStatus.OK, result.getStatusCodeDTO().getStatus());
+    }
+
+    @Test
+    void getFlightsWithFiltersSuccess() throws InvalidDestinationException {
+        // Arrange
+        List<FlightDTO> flights = getFlightsDTO();
+        Mockito.doNothing().when(this.flightRepository).containsDestination(Mockito.anyString());
+        Mockito.when(this.flightRepository.getFlights(Mockito.any(), Mockito.any(), Mockito.anyString(), Mockito.anyString())).thenReturn(flights);
+
+        // Act & Assert
+        ListResponseDTO<FlightDTO> result = Assertions.assertDoesNotThrow(
+                () -> this.tourismAgencyService.getFlights(new Date("03/02/2021"), new Date("03/04/2021"), "foo", "bar")
+        );
+        Assertions.assertNotNull(result);
+        Assertions.assertTrue(result.getList().size() > 0);
+        Assertions.assertIterableEquals(flights, result.getList());
+        Assertions.assertEquals(flights.size(), result.getTotal());
+        Assertions.assertEquals(HttpStatus.OK, result.getStatusCodeDTO().getStatus());
+    }
+
+    @Test
+    void getFlightsWithFiltersThrowsInvalidDestinationException() throws InvalidDestinationException {
+        // Arrange
+        InvalidDestinationException expectedException = new InvalidDestinationException(StatusCodeUtil.getCustomStatusCode(
+                "The chosen destination does not exist",
+                HttpStatus.NOT_FOUND));
+        Mockito.doThrow(expectedException).when(this.flightRepository).containsDestination(Mockito.anyString());
+
+        // Act & Assert
+        InvalidDestinationException thrownException = Assertions.assertThrows(
+                InvalidDestinationException.class,
+                () -> this.tourismAgencyService.getFlights(new Date("03/02/2021"), new Date("03/04/2021"), "foo", "bar")
+        );
+        Assertions.assertEquals(expectedException, thrownException);
+        Assertions.assertEquals(HttpStatus.NOT_FOUND, thrownException.getStatusCodeDTO().getStatus());
+    }
+
+    @Test
+    void getFlightsWithFiltersThrowsInvalidOriginException() throws InvalidOriginException {
+        // Arrange
+        InvalidOriginException expectedException = new InvalidOriginException(StatusCodeUtil.getCustomStatusCode(
+                "The chosen origin does not exist",
+                HttpStatus.NOT_FOUND));
+        Mockito.doThrow(expectedException).when(this.flightRepository).containsOrigin(Mockito.anyString());
+
+        // Act & Assert
+        InvalidOriginException thrownException = Assertions.assertThrows(
+                InvalidOriginException.class,
+                () -> this.tourismAgencyService.getFlights(new Date("03/02/2021"), new Date("03/04/2021"), "foo", "bar")
+        );
+        Assertions.assertEquals(expectedException, thrownException);
+        Assertions.assertEquals(HttpStatus.NOT_FOUND, thrownException.getStatusCodeDTO().getStatus());
+    }
+
+    @Test
+    void getFlightsWithFiltersThrowsInvalidDateException() {
+        // Arrange
+        InvalidDateException expectedException = new InvalidDateException(StatusCodeUtil.getCustomStatusCode(
+                "The dateFrom field must be prior to the dateTo field",
+                HttpStatus.BAD_REQUEST));
+
+        // Act & Assert
+        InvalidDateException thrownException = Assertions.assertThrows(
+                InvalidDateException.class,
+                () -> this.tourismAgencyService.getFlights(new Date("03/04/2021"), new Date("03/02/2021"), "foo", "bar")
+        );
+        Assertions.assertEquals(expectedException.getMessage(), thrownException.getMessage());
+        Assertions.assertEquals(HttpStatus.BAD_REQUEST, thrownException.getStatusCodeDTO().getStatus());
+    }
+
+    @Test
+    void bookFlightSuccess(){
+        // Arrange
+        Date dateFrom = new Date("02/01/2021");
+        Date dateTo = new Date("03/03/2021");
+
+        FlightReservationRequestDTO flightReservationRequestDTO = getFlightReservationRequestDTO(dateFrom, dateTo, "buenos aires", "puerto iguazú", 1);
+        Mockito.when(this.flightRepository.hasAvailability(Mockito.anyString(), Mockito.anyString(), Mockito.anyString(), Mockito.any(), Mockito.any(), Mockito.anyString())).thenReturn(Optional.of(getFlightDTO()));
+
+        // Act & Assert
+        FlightReservationResponseDTO result = Assertions.assertDoesNotThrow(
+                () -> this.tourismAgencyService.bookFlight(flightReservationRequestDTO)
+        );
+        Assertions.assertEquals(flightReservationRequestDTO.getFlightReservation(), result.getFlightReservation());
+        Assertions.assertEquals(HttpStatus.OK, result.getStatusCodeDTO().getStatus());
+    }
+
+
     private BookingRequestDTO getBookingRequestDTO(Date dateFrom, Date dateTo, String destination, String roomType, Integer cardDues){
         List<PeopleDTO> people = getPeopleDTO();
         PaymentMethodDTO paymentMethodDTO = getPaymentMethodDTO(cardDues);
@@ -234,7 +337,7 @@ public class TourismAgencyServiceTests {
         bookingDTO.setRoomType(roomType);
         bookingDTO.setDateFrom(dateFrom);
         bookingDTO.setDateTo(dateTo);
-        bookingDTO.setHotelCode("CH-0003");
+        bookingDTO.setHotelCode("foo");
         bookingDTO.setPeople(people);
         bookingDTO.setDestination(destination);
         bookingDTO.setPeopleAmount(people.size());
@@ -293,7 +396,7 @@ public class TourismAgencyServiceTests {
     private HotelDTO getHotelDTO(){
         HotelDTO hotel = new HotelDTO();
         hotel.setAvailableFrom(new Date("02/02/2021"));
-        hotel.setAvailableTo(new Date(("04/04/2021")));
+        hotel.setAvailableTo(new Date("04/04/2021"));
         hotel.setBooked(false);
         hotel.setCity("foo");
         hotel.setCode("bar");
@@ -302,5 +405,54 @@ public class TourismAgencyServiceTests {
         hotel.setPrice(100d);
 
         return hotel;
+    }
+
+    private FlightReservationRequestDTO getFlightReservationRequestDTO(Date dateFrom, Date dateTo, String origin, String destination, Integer cardDues){
+        FlightReservationDTO flightReservationDTO = getFlightReservationDTO(dateFrom, dateTo, origin, destination, cardDues);
+
+        FlightReservationRequestDTO flightReservationRequestDTO = new FlightReservationRequestDTO();
+        flightReservationRequestDTO.setUsername("foo@bar.baz");
+        flightReservationRequestDTO.setFlightReservation(flightReservationDTO);
+
+        return flightReservationRequestDTO;
+    }
+
+    private List<FlightDTO> getFlightsDTO(){
+        List<FlightDTO> flights = new ArrayList<>();
+        flights.add(getFlightDTO());
+        flights.add(getFlightDTO());
+        flights.add(getFlightDTO());
+
+        return flights;
+    }
+
+    private FlightReservationDTO getFlightReservationDTO(Date dateFrom, Date dateTo, String origin, String destination, Integer cardDues){
+        List<PeopleDTO> people = getPeopleDTO();
+
+        FlightReservationDTO flightReservationDTO = new FlightReservationDTO();
+        flightReservationDTO.setFlightNumber("foo");
+        flightReservationDTO.setDateFrom(dateFrom);
+        flightReservationDTO.setDateTo(dateTo);
+        flightReservationDTO.setOrigin(origin);
+        flightReservationDTO.setDestination(destination);
+        flightReservationDTO.setPaymentMethod(getPaymentMethodDTO(cardDues));
+        flightReservationDTO.setPeople(people);
+        flightReservationDTO.setSeats(people.size());
+        flightReservationDTO.setSeatType("bar");
+
+        return flightReservationDTO;
+    }
+
+    private FlightDTO getFlightDTO(){
+        FlightDTO flightDTO = new FlightDTO();
+        flightDTO.setDateFrom(new Date("02/02/2021"));
+        flightDTO.setDateTo(new Date("04/04/2021"));
+        flightDTO.setFlightNumber("foo");
+        flightDTO.setDestination("bar");
+        flightDTO.setOrigin("baz");
+        flightDTO.setSeatType("quz");
+        flightDTO.setPrice(100d);
+
+        return flightDTO;
     }
 }
