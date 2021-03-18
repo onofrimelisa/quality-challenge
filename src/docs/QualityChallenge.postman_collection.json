@@ -1,0 +1,168 @@
+{
+	"info": {
+		"_postman_id": "3572241c-984e-4553-8c95-2b9a239f2948",
+		"name": "Quality Challenge",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Get all hotels with filters",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:8080/api/v1/hotels?dateFrom=11/02/2021&dateTo=02/03/2021&destination=puerto iguazú",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"v1",
+						"hotels"
+					],
+					"query": [
+						{
+							"key": "dateFrom",
+							"value": "11/02/2021"
+						},
+						{
+							"key": "dateTo",
+							"value": "02/03/2021"
+						},
+						{
+							"key": "destination",
+							"value": "puerto iguazú"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Book hotel",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"username\": \"arjonamiguel@gmail.com\",\n    \"booking\": {\n        \"dateFrom\": \"25/02/2021\",\n        \"dateTo\": \"01/03/2021\",\n        \"destination\": \"puerto iguazú\",\n        \"hotelCode\": \"CH-0003\",\n        \"peopleAmount\": 3, \n        \"roomType\": \"triple\",\n        \"people\": [\n            {\n                \"dni\": \"4568215\",\n                \"name\": \"bu\",\n                \"lastname\": \"bu\",\n                \"birthDate\": \"10/25/8759\",\n                \"mail\": \"arjonamiguel@gmail.com\"\n            },\n            {\n                \"dni\": \"4568215\",\n                \"name\": \"bu\",\n                \"lastname\": \"bu\",\n                \"birthDate\": \"10/25/8759\",\n                \"mail\": \"arjonamiguel@gmail.com\"\n            },\n            {\n                \"dni\": \"4568215\",\n                \"name\": \"bu\",\n                \"lastname\": \"bu\",\n                \"birthDate\": \"10/25/8759\",\n                \"mail\": \"arjonamiguel@gmail.com\"\n            }\n        ],\n        \"paymentMethod\": {\n            \"type\": \"credit\",\n            \"number\": \"1234\",\n            \"dues\": 1\n        }\n    }\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8080/api/v1/booking",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"v1",
+						"booking"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get all flights with filters",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:8080/api/v1/flights?dateFrom=11/02/2021&dateTo=25/03/2021&destination=buenos aires&origin=bogotá",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"v1",
+						"flights"
+					],
+					"query": [
+						{
+							"key": "dateFrom",
+							"value": "11/02/2021"
+						},
+						{
+							"key": "dateTo",
+							"value": "25/03/2021"
+						},
+						{
+							"key": "destination",
+							"value": "buenos aires"
+						},
+						{
+							"key": "origin",
+							"value": "bogotá"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Book fligth",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"username\": \"arjonamiguel@gmail.com\",\n    \"flightReservation\": {\n        \"dateFrom\": \"01/03/2021\",\n        \"dateTo\": \"14/03/2021\",\n        \"destination\": \"buenos aires\",\n        \"origin\": \"bogotá\",\n        \"flightNumber\": \"boba-6567\",\n        \"seats\": 2, \n        \"seatType\": \"economy\",\n        \"people\": [\n            {\n                \"dni\": \"4568215\",\n                \"name\": \"bu\",\n                \"lastname\": \"bu\",\n                \"birthDate\": \"10/12/2021\",\n                \"mail\": \"arjonamiguel@gmail.com\"\n            },\n            {\n                \"dni\": \"4568215\",\n                \"name\": \"bu\",\n                \"lastname\": \"bu\",\n                \"birthDate\": \"10/12/2021\",\n                \"mail\": \"arjonamiguel@gmail.com\"\n            }\n        ],\n        \"paymentMethod\": {\n            \"type\": \"credit\",\n            \"number\": \"1234\",\n            \"dues\": 1\n        }\n    }\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8080/api/v1/flight-reservation",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"v1",
+						"flight-reservation"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get all hotels",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:8080/api/v1/hotels",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"v1",
+						"hotels"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get all flights",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": null
+			},
+			"response": []
+		}
+	]
+}
